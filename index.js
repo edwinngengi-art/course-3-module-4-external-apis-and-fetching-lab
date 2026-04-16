@@ -2,39 +2,36 @@
 const weatherApi = "https://api.weather.gov/alerts/active?area="
 
 // Your code here!
-const form = document.getElementById("weather-form");
 const input = document.getElementById("state-input");
-const results = document.getElementById("weather-results");
+const button = document.getElementById("fetch-alerts");
+const results = document.getElementById("alerts-display");
 const errorDiv = document.getElementById("error-message");
 
-form.addEventListener("submit", handleSubmit);
+button.addEventListener("click", handleClick);
 
-async function handleSubmit(e) {
-  e.preventDefault();
+async function handleClick() {
   const state = input.value.trim().toUpperCase();
 
   results.innerHTML = "";
   errorDiv.textContent = "";
-  errorDiv.style.display = "none";
+  errorDiv.classList.add("hidden");
 
   try {
     if (!state) {
       throw new Error("Please enter a state abbreviation");
     }
 
-    const response = await fetch(`https://api.weather.gov/alerts/active?area=${state}`);
+    const response = await fetch(`${weatherApi}${state}`);
 
     if (!response.ok) {
       throw new Error("Failed to fetch weather alerts");
     }
 
     const data = await response.json();
-
-    const title = data.title;
     const alerts = data.features;
 
     const summary = document.createElement("h2");
-    summary.textContent = `${title}: ${alerts.length}`;
+    summary.textContent = `${data.title}: ${alerts.length}`;
     results.appendChild(summary);
 
     const ul = document.createElement("ul");
@@ -51,6 +48,6 @@ async function handleSubmit(e) {
 
   } catch (error) {
     errorDiv.textContent = error.message;
-    errorDiv.style.display = "block";
+    errorDiv.classList.remove("hidden");
   }
 }
